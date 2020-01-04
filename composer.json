@@ -1,0 +1,19 @@
+{
+  "name": "doirun/affiliate",
+  "description": "Affiliate tracking.",
+  "type": "magento2-module",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "Kevin Bodwell",
+      "email": "kevin@doi.run",
+      "homepage": "https://github.com/doirun"
+    }
+  ],
+  "autoload": {
+    "files": [ "registration.php" ],
+    "psr-4": {
+      "DoIRun\\Affiliate\\" : ""
+    }
+  }
+}

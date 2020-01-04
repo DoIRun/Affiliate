@@ -1,0 +1,48 @@
+<?php
+/**
+* @var $block Nume\Affiliate\Block\Onepage\Success
+*/
+?>
+<!-- begin ShareASale.com affiliate tracking -->
+<?php
+$merchantid = $this->helper('DoIRun\Affiliate\Helper\ConfigData')->getConfig('affiliate/shareasale/merchantid');
+$sscidmode = 6;
+$sscid = ! empty($_COOKIE['shareasaleMagentoSSCID']) ? $_COOKIE['shareasaleMagentoSSCID'] : '';
+$order          = $block->getOrder();
+$orderId        = $order->getIncrementId();
+$subtotal       = $order->getSubtotal();
+$discount       = $order->getDiscountAmount();
+$affiliateTotal = ($subtotal + $discount);
+$ordered_items  = $order->getAllVisibleItems();
+$skulist        = '';
+$pricelist      = '';
+$quantitylist   = '';
+$last_index     = array_search(end($ordered_items), $ordered_items, true);
+
+foreach ($ordered_items as $index => $item) {
+    $delimiter    = $index === $last_index ? '' : ',';
+    $skulist      .= $item->getSku() . $delimiter;
+    $quantitylist .= ceil($item->getQtyOrdered()) . $delimiter;
+    $pricelist    .= ($item->getProduct()->getFinalPrice() - ($item->getDiscountAmount() / $item->getQtyOrdered())) . $delimiter;
+}
+
+$couponcodes = $order->getCouponCode();
+$newcustomer = '';
+$customer = $order->getCustomerId();
+
+if ($customer) {
+    // This logic really makes little sense, as if a customer checks out as guest multiple times this logic will never run.  A repeat customer is not exclusively a signed in customer.  I'm going to leave this logic out as 90% of people checkout as guest plus it's not good practice to use object manager to get data.
+    //    $orderCount = $objectManager->create('\Magento\Sales\Model\ResourceModel\Order\CollectionFactory')
+    //            ->create()
+    //            ->addFieldToSelect('*')
+    //            ->addFieldToFilter('customer_id', $customer)
+    //            ->setOrder('created_at', 'desc')
+    //            ->count();
+    //$newcustomer = ($orderCount > 1 ? 0 : 1);
+}
+
+$currency = $order->getOrderCurrencyCode();
+?>
+<img id="_SHRSL_img_1" src="https://shareasale.com/sale.cfm?tracking=<?php echo $orderId ?>&amp;amount=<?php echo $affiliateTotal ?>&amp;transtype=sale&amp;merchantID=<?php echo $merchantid ?>&amp;couponcode=<?php echo $couponcodes ?>&amp;skulist=<?php echo $skulist ?>&amp;quantitylist=<?php echo $quantitylist ?>&amp;pricelist=<?php echo $pricelist ?>&amp;newcustomer=<?php echo $newcustomer ?>&amp;currency=<?php echo $currency ?>&amp;sscid=<?php echo $sscid ?>&amp;sscidmode=<?php echo $sscidmode ?>&amp;v=2.0" width="1" height="1">
+<script defer async type="text/javascript" src="https://shareasale-analytics.com/j.js"></script>
+<!-- end ShareASale.com affiliate tracking -->
